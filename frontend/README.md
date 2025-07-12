@@ -1,69 +1,88 @@
-# React + TypeScript + Vite
+# LexiGrok - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the frontend application for LexiGrok, a web-based language learning platform.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The frontend is built using the following technologies:
 
-## Expanding the ESLint configuration
+-   **Framework/Library:** React 19 (with Vite)
+-   **Language:** TypeScript
+-   **UI Components:** Shadcn UI
+-   **Styling:** Tailwind CSS
+-   **Routing:** TanStack Router (v1, file-based routing)
+-   **Package Manager:** pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Directory Structure
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Key directories and files within `frontend/src/`:
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+-   `assets/`: Static assets like images and icons.
+-   `components/`:
+    -   `ui/`: Shadcn UI components (typically auto-generated/installed).
+    -   Custom application components (e.g., `PracticeView.tsx`, `TopicSelectionView.tsx`, `MessageBubble.tsx`, etc.).
+-   `lib/`: Utility functions, e.g., `utils.ts` for `cn()` from Shadcn.
+-   `routes/`: Contains files for TanStack Router's file-based routing.
+    -   `__root.tsx`: The root layout component for the entire application.
+    -   `index.tsx`: Route for the topic selection page (`/`).
+    -   `practice.tsx`: Route for the conversation practice page (`/practice`).
+-   `main.tsx`: The main entry point for the React application, initializes the TanStack Router.
+-   `routeTree.gen.ts`: Auto-generated file by TanStack Router Vite plugin, defining the route structure. (Do not edit manually).
+-   `index.css`: Global styles and Tailwind CSS imports.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Setup and Installation
+
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+
+2.  **Install dependencies:**
+    Ensure you have Node.js and pnpm installed.
+    ```bash
+    pnpm install
+    ```
+    This will install all necessary packages defined in `package.json`.
+
+## Running the Development Server
+
+1.  **Start the Vite development server:**
+    ```bash
+    pnpm dev
+    ```
+    This command will start the server, typically on `http://localhost:5173`. The application will automatically reload if you make changes to the code.
+    The TanStack Router Vite plugin will also generate/update `src/routeTree.gen.ts` when the dev server starts or when files in `src/routes/` change.
+
+## Key Features & Components (Conceptual)
+
+-   **Topic Selection (`TopicSelectionView`, `TopicSelector`, `TopicCard`):**
+    -   Allows users to choose a predefined topic or enter a custom one.
+    -   Uses Shadcn `Card`, `Input`, and `Button` components.
+    -   Navigates to the practice view with the selected topic information.
+-   **Practice View (`PracticeView`):**
+    -   The main interface for conversation practice.
+    -   Displays the current topic.
+    -   Includes:
+        -   `ConversationHistory`: Shows the dialogue using `MessageBubble` components within a `ScrollArea`.
+        -   `UserInput`: Handles text and (future) voice input using `Textarea` and `Button`.
+        -   `SuggestionPrompt`: Provides contextual suggestions to the user.
+        -   `ContextualTranslationPopup`: A `Dialog` to show word translations.
+-   **Routing:**
+    -   Managed by TanStack Router using a file-based system. Routes are defined by creating `.tsx` files in the `src/routes` directory.
+    -   The root layout (`__root.tsx`) provides global navigation and structure.
+
+## Building for Production
+
+To create a production build:
+```bash
+pnpm build
 ```
+This will generate optimized static assets in the `dist/` directory.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Linting
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To lint the codebase:
+```bash
+pnpm lint
 ```
+(ESLint configuration is in `eslint.config.js`.)
