@@ -60,21 +60,26 @@ async def post_user_message(message: schemas.UserMessage):
     Process a user's message (text or transcribed voice) and get a bot response.
     This is where the core language model interaction would happen.
     """
-    # Placeholder logic: Echo back or simple canned response based on topic/text
-    bot_text = f"Bot processed: '{message.text}'"
-    if message.topic_id:
-        bot_text += f" (on topic: {message.topic_id})"
+    # Updated placeholder logic to check for image
+    if message.topic_id == "image-practice" and message.imageUrl:
+        # If it's an image practice session, the bot's response should be about the image
+        # A real implementation would use a multimodal model (like GPT-4 Vision)
+        # to analyze the image and the user's text.
+        bot_text = f"Analizando la imagen y tu descripción: '{message.text}'. ¡Buen trabajo! ¿Qué más ves?"
+        suggestion = "Describe el fondo de la imagen."
+    else:
+        # Standard topic-based response
+        bot_text = f"Bot processed: '{message.text}'"
+        if message.topic_id:
+            bot_text += f" (on topic: {message.topic_id})"
 
-    # Simple suggestion logic
-    suggestion = "Puedes preguntarme sobre el tiempo." # "You can ask me about the weather."
-    if "pharmacy" in (message.topic_id or ""):
-        suggestion = "¿Necesitas algo más de la farmacia?"
-    elif "food" in (message.topic_id or ""):
-        suggestion = "¿Qué tipo de comida te gusta?"
+        suggestion = "Puedes preguntarme sobre el tiempo." # "You can ask me about the weather."
+        if "pharmacy" in (message.topic_id or ""):
+            suggestion = "¿Necesitas algo más de la farmacia?"
+        elif "food" in (message.topic_id or ""):
+            suggestion = "¿Qué tipo de comida te gusta?"
 
-
-    # Simulate session management
-    session_id = message.session_id or "new_session_123"
+    session_id = message.session_id or f"session_{int(time.time())}"
 
     return schemas.BotResponse(session_id=session_id, response_text=bot_text, suggestion=suggestion)
 

@@ -12,10 +12,10 @@ class SuggestedTopicsResponse(BaseModel):
 
 # --- Conversation Schemas ---
 class UserMessage(BaseModel):
-    session_id: Optional[str] = None # To maintain conversation context
+    session_id: Optional[str] = None
     text: str
-    topic_id: Optional[str] = None # Current topic
-    # audio_data: Optional[bytes] = None # If sending raw audio data
+    topic_id: Optional[str] = None
+    imageUrl: Optional[str] = None # To pass the Data URL of the image
 
 class BotResponse(BaseModel):
     session_id: str
