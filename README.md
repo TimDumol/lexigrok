@@ -30,6 +30,27 @@ The repository is organized as follows:
 
 ## Getting Started
 
+### With Docker
+
+The easiest way to get the application running locally is with Docker.
+
+1.  **Prerequisites:**
+    -   [Docker](httpshttps://docs.docker.com/get-docker/) installed on your machine.
+    -   [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+2.  **Running the application:**
+    -   Clone the repository.
+    -   Navigate to the root of the project.
+    -   Run the following command:
+        ```bash
+        docker-compose up --build
+        ```
+    -   The frontend will be available at `http://localhost:5173`.
+    -   The backend will be available at `http://localhost:8000`.
+    -   The Minio console will be available at `http://localhost:9001`.
+
+### Without Docker
+
 To get the application running locally, you will need to set up and run both the frontend and backend services independently.
 
 1.  **Frontend Setup:**
