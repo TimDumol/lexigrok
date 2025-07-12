@@ -8,7 +8,7 @@ This directory contains the backend API for LexiGrok, built using FastAPI.
 -   **Language:** Python 3.13+
 -   **Serving:** Uvicorn
 -   **Data Validation:** Pydantic (used by FastAPI)
--   **Dependency Management/Runner:** uv (recommended, based on project setup) or pip
+-   **Dependency Management/Runner:** uv
 
 ## Directory Structure
 
@@ -27,25 +27,15 @@ This directory contains the backend API for LexiGrok, built using FastAPI.
     cd backend
     ```
 
-2.  **Set up a Python Virtual Environment:**
-    It's highly recommended to use a virtual environment. If you have Python 3.13+ installed:
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-    ```
-    (The `.python-version` file suggests Python 3.13.0. Tools like `pyenv` can use this file to automatically set the Python version if configured.)
+2. **Install uv**
+    You can follow the [install guide](https://docs.astral.sh/uv/getting-started/installation/). 
 
 3.  **Install Dependencies:**
     The primary dependency is FastAPI. You'll also need Uvicorn to serve the application.
     Using `uv` (if installed, as suggested by `uv.lock` in the project root):
     ```bash
-    uv pip install fastapi "uvicorn[standard]" pydantic
+    uv sync
     ```
-    Alternatively, using `pip`:
-    ```bash
-    pip install fastapi "uvicorn[standard]" pydantic
-    ```
-    *Note: `pyproject.toml` lists `fastapi` as a core dependency. The above commands ensure `uvicorn` (for serving) and `pydantic` (explicitly, though FastAPI includes it) are also available in your environment.*
 
 ## Running the Development Server
 
@@ -53,14 +43,9 @@ Once dependencies are installed and your virtual environment is active:
 
 -   **From the `backend` directory:**
     ```bash
-    uvicorn app.main:app --reload
+    ./scripts/dev-server.sh
     ```
--   **Or, from the project root directory:**
-    ```bash
-    uvicorn backend.app.main:app --reload --app-dir backend
-    ```
-
-The API server will typically start on `http://localhost:8000`.
+The API server will start on `http://localhost:9933`.
 
 ## API Overview
 
@@ -82,4 +67,4 @@ The API provides endpoints to support the language learning application. Current
     -   Request: `TranslationRequest` schema (includes `word`, `context`).
     -   Response: `TranslationResponse` schema.
 
-Refer to `backend/app/schemas.py` for detailed request/response models and `backend/app/main.py` for endpoint implementations. Interactive API documentation (Swagger UI) is usually available at `http://localhost:8000/docs` when the server is running.
+Refer to `backend/app/schemas.py` for detailed request/response models and `backend/app/main.py` for endpoint implementations. Interactive API documentation (Swagger UI) is usually available at `http://localhost:9933/docs` when the server is running.
