@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import MessageBubble, { Message } from './MessageBubble'; // Import Message interface from MessageBubble
+import MessageBubble from './MessageBubble'; // Import Message interface from MessageBubble
+import type { Message } from './MessageBubble';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
@@ -42,9 +43,9 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
                 key={msg.id}
                 message={msg}
                 onWordClick={onWordClick}
-                // Assuming originalUserSpokenText is part of the Message object if applicable
-                // showUserSpokenText={msg.sender === 'user' ? showUserSpokenTextSetting : undefined}
-                // originalUserSpokenText={msg.sender === 'user' ? msg.originalSpokenText : undefined}
+              // Assuming originalUserSpokenText is part of the Message object if applicable
+              // showUserSpokenText={msg.sender === 'user' ? showUserSpokenTextSetting : undefined}
+              // originalUserSpokenText={msg.sender === 'user' ? msg.originalSpokenText : undefined}
               />
             ))
           )}
