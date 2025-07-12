@@ -30,10 +30,10 @@ const TopicCard: React.FC<TopicCardProps> = ({ topic, onSelect }) => {
           <CardDescription>{topic.description}</CardDescription>
         )}
       </CardHeader>
-      {/* <CardContent> */}
+      <CardContent>
         {/* If there was more content like an image, it could go here */}
         {/* {topic.imageUrl && <img src={topic.imageUrl} alt={topic.name} className="rounded-md object-cover h-48 w-full" />} */}
-      {/* </CardContent> */}
+      </CardContent>
       <CardFooter className="mt-auto"> {/* Pushes footer to the bottom if card content is variable */}
         <Button onClick={() => onSelect(topic)} className="w-full">
           Select Topic
