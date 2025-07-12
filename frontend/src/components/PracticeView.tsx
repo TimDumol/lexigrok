@@ -5,7 +5,6 @@ import UserInput from './UserInput';
 import SuggestionPrompt from './SuggestionPrompt';
 import ContextualTranslationPopup from './ContextualTranslationPopup';
 import { Message } from './MessageBubble'; // Re-using Message interface
-import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 
 interface PracticeViewProps {
@@ -47,7 +46,7 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     setCurrentSuggestion(`Ask something related to "${currentTopicName}". For example, "What is common in this situation?"`);
   }, [currentTopicName]);
 
-  const handleSendMessage = (text: string, type: 'text' | 'voice') => {
+  const handleSendMessage = (text: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',

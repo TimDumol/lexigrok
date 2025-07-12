@@ -14,7 +14,7 @@ interface ConversationHistoryProps {
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   messages,
   onWordClick,
-  showUserSpokenTextSetting,
+  // showUserSpokenTextSetting,
   className,
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
