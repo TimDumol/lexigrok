@@ -22,7 +22,7 @@ describe('ImageUploadView', () => {
   it('handles file selection and preview', async () => {
     render(<ImageUploadView onImageSelected={onImageSelected} onCancel={onCancel} />);
     const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
-    const input = screen.getByLabelText('Click or drag & drop to upload');
+    const input = screen.getByTestId('file-input');
 
     Object.defineProperty(input, 'files', {
       value: [file],
@@ -53,7 +53,7 @@ describe('ImageUploadView', () => {
 
     render(<ImageUploadView onImageSelected={onImageSelected} onCancel={onCancel} />);
     const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
-    const input = screen.getByLabelText('Click or drag & drop to upload');
+    const input = screen.getByTestId('file-input');
 
     Object.defineProperty(input, 'files', {
       value: [file],

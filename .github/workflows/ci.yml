@@ -26,6 +26,8 @@ jobs:
       run: pnpm lint
     - name: Build
       run: pnpm build
+    - name: Test
+      run: pnpm test
   backend:
     runs-on: ubuntu-latest
     defaults:
