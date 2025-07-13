@@ -129,6 +129,7 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
                 className="hidden"
                 accept="image/*"
                 onChange={handleFileChange}
+                data-testid="file-input"
               />
             </div>
           ) : (
