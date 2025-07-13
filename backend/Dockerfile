@@ -1,25 +1,14 @@
-# Use the official Python image.
-# Make sure to use the same version as in `backend/.python-version`
-FROM python:3.12-slim as base
+FROM ghcr.io/astral-sh/uv:0.7-python3.13-bookworm-slim
 
-# Install uv
-FROM base as uv-install
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-RUN sh /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
+ENV UV_COMPILE_BYTECODE=1
 
-# Install dependencies
-FROM uv-install as deps
 WORKDIR /app
-COPY pyproject.toml uv.lock ./
-RUN uv sync --locked
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project
 
-# Final image
-FROM base as final
-WORKDIR /app
-COPY --from=deps /app/.venv /app/.venv
-COPY . .
+COPY . /app
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
-CMD ["uv", "run", "--host", "0.0.0.0", "--port", "8000", "app.main:app"]
+CMD ["uv", "run", "uvicorn", "--host", "0.0.0.0", "--port", "8000", "lexigrok.main:app"]
