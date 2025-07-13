@@ -1,8 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-echo "Running frontend linting and fixing..."
-npx lint-staged
-
-echo "Running backend linting and fixing..."
-(cd backend && uv sync --python 3.13 && uv run ruff check . --fix)
