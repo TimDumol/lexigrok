@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
-from typing import List
+import time
+from fastapi import FastAPI
+from typing import Optional
 
-from . import schemas # Use relative import for schemas
+from . import schemas  # Use relative import for schemas
 
 app = FastAPI(
     title="Language Learning App API",
@@ -11,35 +12,78 @@ app = FastAPI(
 
 # --- Mock Data / Placeholder Logic ---
 mock_topics_db = [
-    schemas.Topic(id="topic_food", name="Ordering food at a restaurant", description="Practice common phrases for dining out."),
-    schemas.Topic(id="topic_directions", name="Asking for directions", description="Learn how to ask for and understand directions."),
-    schemas.Topic(id="topic_shopping", name="Shopping for clothes", description="Practice vocabulary related to clothes and shopping."),
-    schemas.Topic(id="topic_pharmacy", name="At the pharmacy", description="Discuss symptoms and medications at a pharmacy."),
+    schemas.Topic(
+        id="topic_food",
+        name="Ordering food at a restaurant",
+        description="Practice common phrases for dining out.",
+    ),
+    schemas.Topic(
+        id="topic_directions",
+        name="Asking for directions",
+        description="Learn how to ask for and understand directions.",
+    ),
+    schemas.Topic(
+        id="topic_shopping",
+        name="Shopping for clothes",
+        description="Practice vocabulary related to clothes and shopping.",
+    ),
+    schemas.Topic(
+        id="topic_pharmacy",
+        name="At the pharmacy",
+        description="Discuss symptoms and medications at a pharmacy.",
+    ),
 ]
 
 mock_translations_db = {
-    "hola": schemas.TranslationResponse(word="hola", translation="hello", explanation="A common Spanish greeting.", example_sentence_source="Hola, ¿cómo estás?", example_sentence_target="Hello, how are you?"),
-    "adiós": schemas.TranslationResponse(word="adiós", translation="goodbye", explanation="A common Spanish farewell."),
-    "gracias": schemas.TranslationResponse(word="gracias", translation="thank you", explanation="Expressing gratitude."),
-    "pastillas": schemas.TranslationResponse(word="pastillas", translation="pills, tablets", explanation="Solid forms of medication.", example_sentence_source="Necesito unas pastillas para el dolor.", example_sentence_target="I need some pills for the pain."),
-    "jarabe": schemas.TranslationResponse(word="jarabe", translation="syrup", explanation="Liquid medication.", example_sentence_source="Prefiero el jarabe para la tos.", example_sentence_target="I prefer syrup for the cough."),
+    "hola": schemas.TranslationResponse(
+        word="hola",
+        translation="hello",
+        explanation="A common Spanish greeting.",
+        example_sentence_source="Hola, ¿cómo estás?",
+        example_sentence_target="Hello, how are you?",
+    ),
+    "adiós": schemas.TranslationResponse(
+        word="adiós", translation="goodbye", explanation="A common Spanish farewell."
+    ),
+    "gracias": schemas.TranslationResponse(
+        word="gracias", translation="thank you", explanation="Expressing gratitude."
+    ),
+    "pastillas": schemas.TranslationResponse(
+        word="pastillas",
+        translation="pills, tablets",
+        explanation="Solid forms of medication.",
+        example_sentence_source="Necesito unas pastillas para el dolor.",
+        example_sentence_target="I need some pills for the pain.",
+    ),
+    "jarabe": schemas.TranslationResponse(
+        word="jarabe",
+        translation="syrup",
+        explanation="Liquid medication.",
+        example_sentence_source="Prefiero el jarabe para la tos.",
+        example_sentence_target="I prefer syrup for the cough.",
+    ),
 }
 
 # --- API Endpoints ---
+
 
 @app.get("/", response_model=schemas.HealthCheck, tags=["General"])
 async def root():
     """Health check endpoint."""
     return schemas.HealthCheck(status="OK: Language Learning API is running!")
 
+
 # --- Topic Endpoints ---
-@app.get("/topics/suggested", response_model=schemas.SuggestedTopicsResponse, tags=["Topics"])
+@app.get(
+    "/topics/suggested", response_model=schemas.SuggestedTopicsResponse, tags=["Topics"]
+)
 async def get_suggested_topics():
     """
     Retrieve a list of suggested topics for practice.
     """
     # In a real app, this could be personalized or fetched from a database.
     return schemas.SuggestedTopicsResponse(topics=mock_topics_db)
+
 
 @app.post("/topics/custom", response_model=schemas.Topic, tags=["Topics"])
 async def create_custom_topic(topic_name: str, description: Optional[str] = None):
@@ -53,8 +97,11 @@ async def create_custom_topic(topic_name: str, description: Optional[str] = None
     # mock_topics_db.append(custom_topic) # If we want to add to suggestions
     return custom_topic
 
+
 # --- Conversation Endpoints ---
-@app.post("/conversation/message", response_model=schemas.BotResponse, tags=["Conversation"])
+@app.post(
+    "/conversation/message", response_model=schemas.BotResponse, tags=["Conversation"]
+)
 async def post_user_message(message: schemas.UserMessage):
     """
     Process a user's message (text or transcribed voice) and get a bot response.
@@ -73,7 +120,9 @@ async def post_user_message(message: schemas.UserMessage):
         if message.topic_id:
             bot_text += f" (on topic: {message.topic_id})"
 
-        suggestion = "Puedes preguntarme sobre el tiempo." # "You can ask me about the weather."
+        suggestion = (
+            "Puedes preguntarme sobre el tiempo."  # "You can ask me about the weather."
+        )
         if "pharmacy" in (message.topic_id or ""):
             suggestion = "¿Necesitas algo más de la farmacia?"
         elif "food" in (message.topic_id or ""):
@@ -81,9 +130,16 @@ async def post_user_message(message: schemas.UserMessage):
 
     session_id = message.session_id or f"session_{int(time.time())}"
 
-    return schemas.BotResponse(session_id=session_id, response_text=bot_text, suggestion=suggestion)
+    return schemas.BotResponse(
+        session_id=session_id, response_text=bot_text, suggestion=suggestion
+    )
 
-@app.post("/conversation/suggest", response_model=schemas.ConversationSuggestionResponse, tags=["Conversation"])
+
+@app.post(
+    "/conversation/suggest",
+    response_model=schemas.ConversationSuggestionResponse,
+    tags=["Conversation"],
+)
 async def get_conversation_suggestion(request: schemas.ConversationSuggestionRequest):
     """
     Get a contextual suggestion for what the user could say next.
@@ -98,8 +154,11 @@ async def get_conversation_suggestion(request: schemas.ConversationSuggestionReq
         suggestion = "Puedes decir: 'Háblame más sobre eso.'"
     return schemas.ConversationSuggestionResponse(suggestion=suggestion)
 
+
 # --- Translation Endpoint ---
-@app.post("/translate/word", response_model=schemas.TranslationResponse, tags=["Translation"])
+@app.post(
+    "/translate/word", response_model=schemas.TranslationResponse, tags=["Translation"]
+)
 async def get_contextual_translation(request: schemas.TranslationRequest):
     """
     Get a contextual translation for a specific word.
@@ -115,6 +174,7 @@ async def get_contextual_translation(request: schemas.TranslationRequest):
             explanation="This is a placeholder translation as the word was not found in the mock database.",
         )
     return translation_data
+
 
 # --- Speech-to-Text (Conceptual - actual STT would be more complex) ---
 # @app.post("/speech/transcribe", tags=["Speech"])
@@ -161,10 +221,13 @@ async def get_contextual_translation(request: schemas.TranslationRequest):
 # Adding a simple main guard for direct execution (though uvicorn is preferred)
 if __name__ == "__main__":
     import uvicorn
+
     # This allows running `python backend/app/main.py` for basic checks, but uvicorn is for serving
     # Note: running this way might have issues with relative imports if not structured as a package.
     # Uvicorn handles this better.
     print("Starting Uvicorn server. Run with: uvicorn backend.app.main:app --reload")
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, app_dir=".") # app_dir assumes running from backend/app
+    uvicorn.run(
+        "main:app", host="0.0.0.0", port=8000, reload=True, app_dir="."
+    )  # app_dir assumes running from backend/app
     # For running from project root: uvicorn.run("backend.app.main:app", ...)
     pass

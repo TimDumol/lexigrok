@@ -35,7 +35,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
@@ -53,4 +53,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
+// cf https://github.com/shadcn-ui/ui/issues/1534 -- upstream issue
+// that I'm not sure is worth fixing at the moment
+// eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants }
