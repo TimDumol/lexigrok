@@ -1,37 +1,61 @@
 import React, { useState } from 'react';
-import TopicCard, { Topic } from './TopicCard'; // Import TopicCard and its Topic interface
+import TopicCard, { Topic } from './TopicCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { FileImage } from 'lucide-react';
 
 interface TopicSelectorProps {
   suggestedTopics: Topic[];
-  onSelectTopic: (topic: Topic | string) => void; // Can be a predefined topic object or a custom string
+  onSelectTopic: (topic: Topic | string) => void;
+  onSelectImage: () => void; // New prop for image selection
 }
 
-const TopicSelector: React.FC<TopicSelectorProps> = ({ suggestedTopics, onSelectTopic }) => {
+const TopicSelector: React.FC<TopicSelectorProps> = ({
+  suggestedTopics,
+  onSelectTopic,
+  onSelectImage,
+}) => {
   const [customTopic, setCustomTopic] = useState('');
 
   const handleStartCustomTopic = () => {
     if (customTopic.trim()) {
       onSelectTopic(customTopic.trim());
-      setCustomTopic(''); // Clear input after submission
+      setCustomTopic('');
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Choose a Topic</h2>
-        <div className="flex w-full max-w-sm items-center space-x-2 mb-6">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          What do you want to practice?
+        </h2>
+        <div className="flex flex-col sm:flex-row w-full max-w-lg mx-auto items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
           <Input
             type="text"
             value={customTopic}
             onChange={(e) => setCustomTopic(e.target.value)}
-            placeholder="Or enter a custom topic..."
+            placeholder="Enter a custom topic..."
             aria-label="Custom topic input"
+            className="flex-grow"
           />
-          <Button onClick={handleStartCustomTopic} disabled={!customTopic.trim()}>
+          <Button
+            onClick={handleStartCustomTopic}
+            disabled={!customTopic.trim()}
+            className="w-full sm:w-auto"
+          >
             Start Custom Topic
+          </Button>
+        </div>
+        <div className="text-center text-muted-foreground my-4">OR</div>
+        <div className="flex justify-center">
+          <Button
+            onClick={onSelectImage}
+            variant="outline"
+            className="w-full max-w-xs"
+          >
+            <FileImage className="mr-2 h-4 w-4" />
+            Practice with an Image
           </Button>
         </div>
       </div>
