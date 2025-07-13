@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import ConversationHistory from './ConversationHistory';
 import UserInput from './UserInput';
 import SuggestionPrompt from './SuggestionPrompt';
-import ContextualTranslationPopup from './ContextualTranslationPopup';
+import TranslationSidebar from './TranslationSidebar';
 import { Message } from './MessageBubble';
 import { ChevronLeft } from 'lucide-react';
 import {
@@ -29,15 +29,18 @@ const PracticeView: React.FC<PracticeViewProps> = ({
   const [showSpokenText, setShowSpokenText] = useState(true);
   const [currentSuggestion, setCurrentSuggestion] = useState<string | null>(null);
 
-  const [translationPopup, setTranslationPopup] = useState<{
-    isVisible: boolean;
-    word: string;
+  const [translationSidebar, setTranslationSidebar] = useState<{
+    isOpen: boolean;
+    selectedText: string;
     translation: string;
     explanation?: string;
     exampleSentence?: string;
     exampleTranslation?: string;
-    position?: { top: number; left: number };
-  }>({ isVisible: false, word: '', translation: '' });
+  }>({
+    isOpen: false,
+    selectedText: '',
+    translation: '',
+  });
 
   useEffect(() => {
     const isImagePractice = currentTopicId === 'image-practice' && imageUrl;
@@ -97,17 +100,22 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     handleSendMessage(suggestion);
   };
 
-  const handleWordClick = (word: string, _message: string, event?: React.MouseEvent) => {
-    setTranslationPopup({
-      isVisible: true,
-      word: word,
-      translation: `Translation of "${word}"`,
-      position: event ? { top: event.clientY + 5, left: event.clientX + 5 } : undefined,
+  const handleTextSelection = (text: string) => {
+    if (text.trim() === '') {
+      return;
+    }
+    setTranslationSidebar({
+      isOpen: true,
+      selectedText: text,
+      translation: `Translation of "${text}"`, // Placeholder
+      explanation: "This is a placeholder explanation for the selected text.",
+      exampleSentence: "This is a placeholder example sentence.",
+      exampleTranslation: "This is a placeholder example sentence translation.",
     });
   };
 
-  const handleCloseTranslationPopup = () => {
-    setTranslationPopup({ ...translationPopup, isVisible: false });
+  const handleCloseTranslationSidebar = () => {
+    setTranslationSidebar({ ...translationSidebar, isOpen: false });
   };
 
   const isImagePractice = currentTopicId === 'image-practice' && imageUrl;
@@ -134,7 +142,7 @@ const PracticeView: React.FC<PracticeViewProps> = ({
       />
       <ConversationHistory
         messages={messages}
-        onWordClick={handleWordClick}
+        onTextSelection={handleTextSelection}
         showUserSpokenTextSetting={showSpokenText}
         className="flex-grow"
       />
@@ -167,9 +175,9 @@ const PracticeView: React.FC<PracticeViewProps> = ({
           <ChatInterface />
         </div>
       )}
-      <ContextualTranslationPopup
-        {...translationPopup}
-        onClose={handleCloseTranslationPopup}
+      <TranslationSidebar
+        {...translationSidebar}
+        onClose={handleCloseTranslationSidebar}
       />
     </>
   );
