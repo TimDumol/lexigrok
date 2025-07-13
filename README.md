@@ -65,6 +65,17 @@ To get the application running locally, you will need to set up and run both the
 
 (Details about contributing to the project can be added here later, such as coding standards, pull request process, etc.)
 
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to enforce code quality and consistency. The hooks are configured in `.pre-commit-config.yaml` and will automatically run checks on every commit.
+
+To use the pre-commit hooks, you need to have `pre-commit` installed. Follow the backend setup instructions to install the necessary development dependencies. Once installed, the hooks will be active.
+
+The following checks are performed:
+- `ruff format`: Formats Python code.
+- `ruff check --fix`: Lints Python code and automatically fixes issues.
+- `eslint`: Lints and fixes frontend code.
+
 ## License
 
 (License information can be added here. For now, assuming it might be under a common open-source license like MIT, or specify if otherwise.)

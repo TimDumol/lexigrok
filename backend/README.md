@@ -37,6 +37,12 @@ This directory contains the backend API for LexiGrok, built using FastAPI.
     uv sync
     ```
 
+4.  **Install Pre-commit Hooks:**
+    This project uses pre-commit hooks to enforce code quality. To install the hooks, run the following command from the `backend` directory after installing dependencies:
+    ```bash
+    uv run pre-commit install
+    ```
+
 ## Running the Development Server
 
 Once dependencies are installed and your virtual environment is active:
