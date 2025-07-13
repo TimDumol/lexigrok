@@ -10,5 +10,5 @@ repos:
     hooks:
     -   id: eslint
         files: frontend/.*\.(js|ts|jsx|tsx)$
-        args: [--fix]
+        args: [--fix, --config, frontend/eslint.config.js]
         directory: frontend
