@@ -16,7 +16,6 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +76,6 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
       // 3. Construct the final URL (assuming a standard MinIO setup)
       // This might need adjustment based on your MinIO public URL configuration.
       const finalImageUrl = `/api/images/${object_name}`; // This needs to be proxied by the server to Minio
-      setUploadedImageUrl(finalImageUrl);
 
 
       // 4. Call the parent component's callback
@@ -93,7 +91,6 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
   const handleRemoveImage = () => {
     setImagePreview(null);
     setSelectedFile(null);
-    setUploadedImageUrl(null);
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
