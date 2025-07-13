@@ -3,7 +3,6 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
-import { globalIgnores } from 'eslint/config'
 
 export default tseslint.config(
   {
@@ -32,6 +31,14 @@ export default tseslint.config(
     },
     rules: {
       'react-refresh/only-export-components': 'warn',
+    },
+  },
+  {
+    files: ['vite.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: 'tsconfig.node.json',
+      },
     },
   },
 )

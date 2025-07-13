@@ -6,8 +6,9 @@ repos:
     -   id: ruff-check
         args: [--fix]
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.4.0
+    rev: v9.31.0
     hooks:
     -   id: eslint
         files: frontend/.*\.(js|ts|jsx|tsx)$
         args: [--fix]
+        directory: frontend

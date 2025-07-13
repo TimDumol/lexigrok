@@ -57,7 +57,7 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     setCurrentSuggestion(suggestionText);
   }, [currentTopicId, currentTopicName, imageUrl]);
 
-  const handleSendMessage = (text: string, _type: 'text' | 'voice' = 'text') => {
+  const handleSendMessage = (text: string) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
