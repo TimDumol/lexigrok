@@ -134,7 +134,7 @@ const PracticeView: React.FC<PracticeViewProps> = ({
       />
       <ConversationHistory
         messages={messages}
-        onWordClick={(word, text, e) => handleWordClick(word, text, e as React.MouseEvent)}
+        onWordClick={handleWordClick}
         showUserSpokenTextSetting={showSpokenText}
         className="flex-grow"
       />

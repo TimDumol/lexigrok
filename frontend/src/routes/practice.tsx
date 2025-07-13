@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import PracticeView from '@/components/PracticeView';
-import React from 'react';
+;
 import { z } from 'zod';
 
 // Updated search params schema to include optional imageUrl

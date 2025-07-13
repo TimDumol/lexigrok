@@ -17,7 +17,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
 }) => {
   const [customTopic, setCustomTopic] = useState('');
 
-  const handleStartCustomTopic = ()_=> {
+  const handleStartCustomTopic = () => {
     if (customTopic.trim()) {
       onSelectTopic(customTopic.trim());
       setCustomTopic('');

@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import TopicSelectionView from '@/components/TopicSelectionView';
 import ImageUploadView from '@/components/ImageUploadView'; // Import the new component
 import { Topic } from '@/components/TopicCard';
-import React, { useState } from 'react'; // Import useState
 
 // Mock topics remain the same
 const mockTopics: Topic[] = [
