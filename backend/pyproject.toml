@@ -9,14 +9,19 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard-no-fastapi-cloud-cli]>=0.116.1",
+    "minio>=7.2.15",
 ]
 
 [project.scripts]
 lexigrok = "lexigrok:main"
 
-
 [dependency-groups]
-dev = ["ruff", "pre-commit"]
+dev = [
+    "ruff",
+    "pre-commit",
+    "pytest>=8.4.0",
+    "python-dotenv>=1.0.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.7.20,<0.8.0"]

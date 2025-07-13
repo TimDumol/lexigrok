@@ -3,12 +3,19 @@ from fastapi import FastAPI
 from typing import Optional
 
 from . import schemas  # Use relative import for schemas
+from fastapi import HTTPException, Depends
+from .storage import MinioStorage, Storage
 
 app = FastAPI(
     title="Language Learning App API",
     description="API for practicing language skills.",
     version="0.1.0",
 )
+
+
+def get_storage():
+    return MinioStorage()
+
 
 # --- Mock Data / Placeholder Logic ---
 mock_topics_db = [
@@ -189,6 +196,27 @@ async def get_contextual_translation(request: schemas.TranslationRequest):
 # # 3. Return transcription.
 # contents = await audio_file.read()
 # return {"filename": audio_file.filename, "transcription": "This is a mock transcription."}
+
+
+# --- Image Upload Endpoint ---
+@app.get("/upload/image", response_model=schemas.PresignedUrlResponse, tags=["Upload"])
+async def get_presigned_url_for_image(
+    file_name: str, storage: Storage = Depends(get_storage)
+):
+    """
+    Get a presigned URL to upload an image file to the storage backend.
+    """
+    # In a real app, you'd want to sanitize the filename and add user-specific prefixes.
+    # For example, to prevent overwrites and organize files.
+    # object_name = f"user-uploads/{session_id}/{uuid.uuid4()}-{file_name}"
+    object_name = f"images/{file_name}"  # Basic example
+    try:
+        url = storage.get_presigned_url(object_name)
+        return schemas.PresignedUrlResponse(url=url, object_name=object_name)
+    except Exception as e:
+        # Log the exception details in a real app
+        print(f"Error generating presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="Could not generate upload URL.")
 
 
 # To run this app (from the `backend` directory):
