@@ -15,6 +15,10 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -27,6 +31,7 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
         return;
       }
       setError(null);
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -39,16 +44,56 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
     fileInputRef.current?.click();
   };
 
-  const handleStartPractice = () => {
-    if (imagePreview) {
-      onImageSelected(imagePreview);
-    } else {
+  const handleStartPractice = async () => {
+    if (!selectedFile || !imagePreview) {
       setError('Please select an image first.');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      // 1. Get presigned URL from backend
+      const response = await fetch(`/api/upload/image?file_name=${encodeURIComponent(selectedFile.name)}`);
+      if (!response.ok) {
+        throw new Error('Failed to get upload URL.');
+      }
+      const { url, object_name } = await response.json();
+
+      // 2. Upload image to presigned URL
+      const uploadResponse = await fetch(url, {
+        method: 'PUT',
+        body: selectedFile,
+        headers: {
+          'Content-Type': selectedFile.type,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Image upload failed.');
+      }
+
+      // 3. Construct the final URL (assuming a standard MinIO setup)
+      // This might need adjustment based on your MinIO public URL configuration.
+      const finalImageUrl = `/api/images/${object_name}`; // This needs to be proxied by the server to Minio
+      setUploadedImageUrl(finalImageUrl);
+
+
+      // 4. Call the parent component's callback
+      onImageSelected(finalImageUrl);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred during upload.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleRemoveImage = () => {
     setImagePreview(null);
+    setSelectedFile(null);
+    setUploadedImageUrl(null);
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -103,10 +148,17 @@ const ImageUploadView: React.FC<ImageUploadViewProps> = ({ onImageSelected, onCa
             </div>
           )}
 
+          {isUploading && (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="ml-4 text-muted-foreground">Uploading...</p>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button onClick={onCancel} variant="outline" className="w-full">Cancel</Button>
-            <Button onClick={handleStartPractice} disabled={!imagePreview} className="w-full">
-              Start Practice
+            <Button onClick={onCancel} variant="outline" className="w-full" disabled={isUploading}>Cancel</Button>
+            <Button onClick={handleStartPractice} disabled={!imagePreview || isUploading} className="w-full">
+              {isUploading ? 'Uploading...' : 'Start Practice'}
             </Button>
           </div>
         </CardContent>
