@@ -3,11 +3,13 @@ import TopicCard, { Topic } from './TopicCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FileImage } from 'lucide-react';
+import SuggestionView from './SuggestionView';
+import { useSuggestTopics } from '@/lib/hooks';
 
 interface TopicSelectorProps {
   suggestedTopics: Topic[];
   onSelectTopic: (topic: Topic | string) => void;
-  onSelectImage: () => void; // New prop for image selection
+  onSelectImage: () => void;
 }
 
 const TopicSelector: React.FC<TopicSelectorProps> = ({
@@ -16,12 +18,26 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
   onSelectImage,
 }) => {
   const [customTopic, setCustomTopic] = useState('');
+  const [isSuggestionViewOpen, setSuggestionViewOpen] = useState(false);
+  const { suggestions, fetchSuggestions } = useSuggestTopics();
 
   const handleStartCustomTopic = () => {
     if (customTopic.trim()) {
       onSelectTopic(customTopic.trim());
       setCustomTopic('');
     }
+  };
+
+  const handleSuggestTopics = async () => {
+    if (customTopic.trim()) {
+      await fetchSuggestions(customTopic.trim());
+      setSuggestionViewOpen(true);
+    }
+  };
+
+  const handleSelectSuggestion = (suggestion: Topic) => {
+    onSelectTopic(suggestion);
+    setSuggestionViewOpen(false);
   };
 
   return (
@@ -46,6 +62,13 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           >
             Start Custom Topic
           </Button>
+          <Button
+            onClick={handleSuggestTopics}
+            disabled={!customTopic.trim()}
+            className="w-full sm:w-auto"
+          >
+            Suggest
+          </Button>
         </div>
         <div className="text-center text-muted-foreground my-4">OR</div>
         <div className="flex justify-center">
@@ -59,6 +82,13 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({
           </Button>
         </div>
       </div>
+
+      <SuggestionView
+        isOpen={isSuggestionViewOpen}
+        onClose={() => setSuggestionViewOpen(false)}
+        suggestions={suggestions}
+        onSelectSuggestion={handleSelectSuggestion}
+      />
 
       <div>
         <h3 className="text-xl font-semibold mb-4">Suggested Topics</h3>

@@ -92,6 +92,25 @@ async def get_suggested_topics():
     return schemas.SuggestedTopicsResponse(topics=mock_topics_db)
 
 
+@app.get(
+    "/topics/suggestions",
+    response_model=schemas.TopicSuggestionResponse,
+    tags=["Topics"],
+)
+async def get_topic_suggestions(q: str):
+    """
+    Get topic suggestions based on a query.
+    """
+    # In a real app, this would call an external API to get suggestions.
+    # For now, we'll just return some mock data.
+    mock_suggestions = [
+        schemas.Topic(id="suggestion_1", name=f"{q} basics", description=f"Learn the basics of {q}"),
+        schemas.Topic(id="suggestion_2", name=f"Advanced {q}", description=f"Master advanced {q} concepts"),
+        schemas.Topic(id="suggestion_3", name=f"{q} for travelers", description=f"Essential {q} phrases for travelers"),
+    ]
+    return schemas.TopicSuggestionResponse(suggestions=mock_suggestions)
+
+
 @app.post("/topics/custom", response_model=schemas.Topic, tags=["Topics"])
 async def create_custom_topic(topic_name: str, description: Optional[str] = None):
     """

@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard-no-fastapi-cloud-cli]>=0.116.1",
+    "fastapi[all]>=0.116.1",
     "minio>=7.2.15",
 ]
 
