@@ -18,6 +18,10 @@ class SuggestedTopicsResponse(BaseModel):
     topics: List[Topic]
 
 
+class TopicSuggestionResponse(BaseModel):
+    suggestions: List[Topic]
+
+
 # --- Conversation Schemas ---
 class UserMessage(BaseModel):
     session_id: Optional[str] = None
