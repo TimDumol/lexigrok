@@ -3,10 +3,19 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/
+          target: /app/
+          ignore:
+            - .venv/
+        - action: rebuild
+          path: ./backend/pyproject.toml
+    command:
+    - /app/backend/scripts/dev-server.sh
     ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app
+      - "127.0.0.1:9933:8000"
     environment:
       - DATABASE_URL=postgresql://lexigrok:NOTPRODcf5962655799c65cf8bf3e811691b@db:5432/lexigrok
       - MINIO_URL=http://minio:9000
@@ -21,7 +30,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     volumes:
       - ./frontend:/app
     depends_on:
@@ -34,15 +43,15 @@ services:
       - POSTGRES_PASSWORD=NOTPRODcf5962655799c65cf8bf3e811691b
       - POSTGRES_DB=lexigrok
     ports:
-      - "5432:5432"
+      - "127.0.0.1:25432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:29000:9000"
+      - "127.0.0.1:29001:9001"
     volumes:
       - minio_data:/data
     environment:

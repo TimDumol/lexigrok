@@ -1,10 +1,10 @@
 import time
 from fastapi import FastAPI
+from fastapi import HTTPException, Depends
 from typing import Optional
 
-from . import schemas  # Use relative import for schemas
-from fastapi import HTTPException, Depends
-from .storage import MinioStorage, Storage
+from lexigrok import schemas  # Use relative import for schemas
+from lexigrok.storage import MinioStorage, Storage
 
 app = FastAPI(
     title="Language Learning App API",
@@ -104,9 +104,21 @@ async def get_topic_suggestions(q: str):
     # In a real app, this would call an external API to get suggestions.
     # For now, we'll just return some mock data.
     mock_suggestions = [
-        schemas.Topic(id="suggestion_1", name=f"{q} basics", description=f"Learn the basics of {q}"),
-        schemas.Topic(id="suggestion_2", name=f"Advanced {q}", description=f"Master advanced {q} concepts"),
-        schemas.Topic(id="suggestion_3", name=f"{q} for travelers", description=f"Essential {q} phrases for travelers"),
+        schemas.Topic(
+            id="suggestion_1",
+            name=f"{q} basics",
+            description=f"Learn the basics of {q}",
+        ),
+        schemas.Topic(
+            id="suggestion_2",
+            name=f"Advanced {q}",
+            description=f"Master advanced {q} concepts",
+        ),
+        schemas.Topic(
+            id="suggestion_3",
+            name=f"{q} for travelers",
+            description=f"Essential {q} phrases for travelers",
+        ),
     ]
     return schemas.TopicSuggestionResponse(suggestions=mock_suggestions)
 
@@ -236,45 +248,3 @@ async def get_presigned_url_for_image(
         # Log the exception details in a real app
         print(f"Error generating presigned URL: {e}")
         raise HTTPException(status_code=500, detail="Could not generate upload URL.")
-
-
-# To run this app (from the `backend` directory):
-# Ensure FastAPI and Uvicorn are installed: pip install fastapi uvicorn
-# Then run: uvicorn app.main:app --reload
-# (You might need to adjust PYTHONPATH if running from outside `backend`
-# or if `schemas` is not found, e.g. `PYTHONPATH=. uvicorn app.main:app --reload`)
-
-# If you have `uv` installed from the project root: `uvicorn backend.app.main:app --reload --app-dir backend`
-# Or from `backend` dir: `uvicorn app.main:app --reload`
-# (Assuming `backend` is added to sys.path or using appropriate PYTHONPATH)
-
-# A common structure is to put main.py and schemas.py directly in `backend/`
-# or in `backend/app/` and then run uvicorn like:
-# `cd backend`
-# `uvicorn app.main:app --reload`
-# If `PYTHONPATH` issues arise, ensure the `app` module can be found.
-# One way is to add `backend` to `PYTHONPATH` or run from `backend` directory.
-# For this setup, if you are in the root directory, you might run:
-# `PYTHONPATH=backend uvicorn app.main:app --reload --port 8000` (if main.py is in backend/app)
-
-# Corrected import for running with `uvicorn backend.app.main:app --reload` from root.
-# The `from . import schemas` should work if `backend` is treated as a package.
-# If running `uvicorn main:app --reload` from `backend/app/`, then `import schemas` is fine.
-# The current structure `backend/app/main.py` and `backend/app/schemas.py` with
-# `from . import schemas` in `main.py` is standard for a submodule.
-# To run from project root: `uvicorn backend.app.main:app --reload`
-# To run from `backend` directory: `uvicorn app.main:app --reload`
-
-# Adding a simple main guard for direct execution (though uvicorn is preferred)
-if __name__ == "__main__":
-    import uvicorn
-
-    # This allows running `python backend/app/main.py` for basic checks, but uvicorn is for serving
-    # Note: running this way might have issues with relative imports if not structured as a package.
-    # Uvicorn handles this better.
-    print("Starting Uvicorn server. Run with: uvicorn backend.app.main:app --reload")
-    uvicorn.run(
-        "main:app", host="0.0.0.0", port=8000, reload=True, app_dir="."
-    )  # app_dir assumes running from backend/app
-    # For running from project root: uvicorn.run("backend.app.main:app", ...)
-    pass
