@@ -19,8 +19,5 @@ COPY . .
 # Build the frontend.
 RUN pnpm build
 
-# Expose the port that the frontend will run on.
-EXPOSE 5173
-
 # Run the frontend server.
 CMD ["pnpm", "preview", "--host", "0.0.0.0"]

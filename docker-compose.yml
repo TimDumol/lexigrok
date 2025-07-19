@@ -13,9 +13,10 @@ services:
         - action: rebuild
           path: ./backend/pyproject.toml
     command:
-    - /app/backend/scripts/dev-server.sh
+    - /app/scripts/dev-server.sh
+    - --host=0.0.0.0
     ports:
-      - "127.0.0.1:9933:8000"
+      - "127.0.0.1:9933:9933"
     environment:
       - DATABASE_URL=postgresql://lexigrok:NOTPRODcf5962655799c65cf8bf3e811691b@db:5432/lexigrok
       - MINIO_URL=http://minio:9000
@@ -33,6 +34,10 @@ services:
       - "127.0.0.1:5173:5173"
     volumes:
       - ./frontend:/app
+    command:
+    - pnpm
+    - dev
+    - --host=0.0.0.0
     depends_on:
       - backend
 

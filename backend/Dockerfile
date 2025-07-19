@@ -10,5 +10,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . /app
 ENV PATH="/app/.venv/bin:$PATH"
-EXPOSE 8000
-CMD ["uv", "run", "uvicorn", "--host", "0.0.0.0", "--port", "8000", "lexigrok.main:app"]
+CMD ["uv", "run", "uvicorn", "--host", "0.0.0.0", "--port", "9933", "lexigrok.main:app"]
