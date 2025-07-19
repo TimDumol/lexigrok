@@ -13,12 +13,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://backend:9933',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
       '/images': {
-        target: 'http://localhost:9000', // Minio endpoint
+        target: 'http://minio:9000', // Minio endpoint
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/images/, '/lexigrok-images'), // Assumes bucket is named 'lexigrok-images'
       }

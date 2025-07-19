@@ -22,7 +22,7 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({ isOpen, onClose, sugges
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {suggestions.map((suggestion) => (
                 <Button key={suggestion.id} variant="outline" onClick={() => onSelectSuggestion(suggestion)}>
-                  {suggestion.title}
+                  {suggestion.name}
                 </Button>
               ))}
             </div>

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ImageUploadView from '../ImageUploadView';
-import { vi } from 'vitest';
+import { vi, expect, it, describe, beforeEach } from 'vitest';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -74,7 +74,7 @@ describe('ImageUploadView', () => {
     });
 
     await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith(mockPresignedUrl, expect.any(Object));
+      expect(fetch).toHaveBeenCalledWith(mockPresignedUrl, expect.any(Object));
     });
 
     await waitFor(() => {
