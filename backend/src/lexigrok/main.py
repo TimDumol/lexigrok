@@ -1,9 +1,12 @@
 import time
-from fastapi import FastAPI
-from fastapi import HTTPException, Depends
+from datetime import timedelta
+
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
 
-from lexigrok import schemas  # Use relative import for schemas
+from lexigrok import schemas, users
+from lexigrok.security import create_access_token, get_current_active_user
 from lexigrok.storage import MinioStorage, Storage
 
 app = FastAPI(
@@ -11,6 +14,8 @@ app = FastAPI(
     description="API for practicing language skills.",
     version="0.1.0",
 )
+
+app.include_router(users.router)
 
 
 def get_storage():
@@ -80,11 +85,29 @@ async def root():
     return schemas.HealthCheck(status="OK: Language Learning API is running!")
 
 
+@app.post("/token", response_model=schemas.Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = users.authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 # --- Topic Endpoints ---
 @app.get(
     "/topics/suggested", response_model=schemas.SuggestedTopicsResponse, tags=["Topics"]
 )
-async def get_suggested_topics():
+async def get_suggested_topics(
+    current_user: schemas.User = Depends(get_current_active_user),
+):
     """
     Retrieve a list of suggested topics for practice.
     """
@@ -97,7 +120,9 @@ async def get_suggested_topics():
     response_model=schemas.TopicSuggestionResponse,
     tags=["Topics"],
 )
-async def get_topic_suggestions(q: str):
+async def get_topic_suggestions(
+    q: str, current_user: schemas.User = Depends(get_current_active_user)
+):
     """
     Get topic suggestions based on a query.
     """
@@ -124,7 +149,11 @@ async def get_topic_suggestions(q: str):
 
 
 @app.post("/topics/custom", response_model=schemas.Topic, tags=["Topics"])
-async def create_custom_topic(topic_name: str, description: Optional[str] = None):
+async def create_custom_topic(
+    topic_name: str,
+    description: Optional[str] = None,
+    current_user: schemas.User = Depends(get_current_active_user),
+):
     """
     Allows a user to define a custom topic (basic version).
     In reality, this might just influence the conversation start.
@@ -140,7 +169,10 @@ async def create_custom_topic(topic_name: str, description: Optional[str] = None
 @app.post(
     "/conversation/message", response_model=schemas.BotResponse, tags=["Conversation"]
 )
-async def post_user_message(message: schemas.UserMessage):
+async def post_user_message(
+    message: schemas.UserMessage,
+    current_user: schemas.User = Depends(get_current_active_user),
+):
     """
     Process a user's message (text or transcribed voice) and get a bot response.
     This is where the core language model interaction would happen.
@@ -178,7 +210,10 @@ async def post_user_message(message: schemas.UserMessage):
     response_model=schemas.ConversationSuggestionResponse,
     tags=["Conversation"],
 )
-async def get_conversation_suggestion(request: schemas.ConversationSuggestionRequest):
+async def get_conversation_suggestion(
+    request: schemas.ConversationSuggestionRequest,
+    current_user: schemas.User = Depends(get_current_active_user),
+):
     """
     Get a contextual suggestion for what the user could say next.
     """
@@ -197,7 +232,10 @@ async def get_conversation_suggestion(request: schemas.ConversationSuggestionReq
 @app.post(
     "/translate/word", response_model=schemas.TranslationResponse, tags=["Translation"]
 )
-async def get_contextual_translation(request: schemas.TranslationRequest):
+async def get_contextual_translation(
+    request: schemas.TranslationRequest,
+    current_user: schemas.User = Depends(get_current_active_user),
+):
     """
     Get a contextual translation for a specific word.
     """
@@ -232,7 +270,9 @@ async def get_contextual_translation(request: schemas.TranslationRequest):
 # --- Image Upload Endpoint ---
 @app.get("/upload/image", response_model=schemas.PresignedUrlResponse, tags=["Upload"])
 async def get_presigned_url_for_image(
-    file_name: str, storage: Storage = Depends(get_storage)
+    file_name: str,
+    storage: Storage = Depends(get_storage),
+    current_user: schemas.User = Depends(get_current_active_user),
 ):
     """
     Get a presigned URL to upload an image file to the storage backend.
