@@ -1,0 +1,9 @@
+{
+    "include": [
+        "backend/src"
+    ],
+    "extraPaths": [
+        "backend/src"
+    ],
+    "pythonVersion": "3.13"
+}
