@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import MessageBubble from '../MessageBubble';
 import { describe, it, expect, vi } from 'vitest';
@@ -14,39 +13,35 @@ describe('MessageBubble', () => {
     const { getByText } = render(
       <MessageBubble
         message={message}
-        onWordClick={() => {}}
-        selectedWordIndexes={[]}
+        onTextSelection={vi.fn()}
       />
     );
     expect(getByText('Hello')).toBeInTheDocument();
     expect(getByText('world')).toBeInTheDocument();
   });
 
-  it('calls onWordClick with the correct word and index when a word is clicked', () => {
-    const onWordClick = vi.fn();
+  it('calls onTextSelection with the selected text when a word is clicked', () => {
+    const onTextSelection = vi.fn();
     const { getByText } = render(
       <MessageBubble
         message={message}
-        onWordClick={onWordClick}
-        selectedWordIndexes={[]}
+        onTextSelection={onTextSelection}
       />
     );
 
     fireEvent.click(getByText('Hello'));
-    expect(onWordClick).toHaveBeenCalledWith('Hello', 0);
-
-    fireEvent.click(getByText('world'));
-    expect(onWordClick).toHaveBeenCalledWith('world', 2);
+    expect(onTextSelection).toHaveBeenCalledWith('Hello');
   });
 
   it('highlights selected words', () => {
     const { getByText } = render(
       <MessageBubble
         message={message}
-        onWordClick={() => {}}
-        selectedWordIndexes={[0]}
+        onTextSelection={vi.fn()}
       />
     );
+
+    fireEvent.click(getByText('Hello'));
     expect(getByText('Hello')).toHaveClass('bg-blue-300');
     expect(getByText('world')).not.toHaveClass('bg-blue-300');
   });

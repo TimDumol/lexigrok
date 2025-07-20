@@ -100,26 +100,14 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     handleSendMessage(suggestion);
   };
 
-  const [selectedWordIndexes, setSelectedWordIndexes] = useState<number[]>([]);
-  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
-
-  const handleWordClick = (word: string, index: number) => {
-    if (/\s+/.test(word)) return; // Ignore whitespace
-
-    const newSelectedWordIndexes =
-      lastClickedIndex === index - 2
-        ? [...selectedWordIndexes, index]
-        : [index];
-
-    setSelectedWordIndexes(newSelectedWordIndexes);
-    setLastClickedIndex(index);
-
-    const words = newSelectedWordIndexes.map(i => messages.find(m => m.text.split(/(\s+)/)[i] === word)?.text.split(/(\s+)/)[i]).join('');
-
+  const handleTextSelection = (text: string) => {
+    if (text.trim() === '') {
+      return;
+    }
     setTranslationSidebar({
       isOpen: true,
-      selectedText: words,
-      translation: `Translation of "${words}"`, // Placeholder
+      selectedText: text,
+      translation: `Translation of "${text}"`, // Placeholder
       explanation: "This is a placeholder explanation for the selected text.",
       exampleSentence: "This is a placeholder example sentence.",
       exampleTranslation: "This is a placeholder example sentence translation.",
@@ -151,8 +139,7 @@ const PracticeView: React.FC<PracticeViewProps> = ({
       />
       <ConversationHistory
         messages={messages}
-        onWordClick={handleWordClick}
-        selectedWordIndexes={selectedWordIndexes}
+        onTextSelection={handleTextSelection}
         showUserSpokenTextSetting={showSpokenText}
         className="flex-grow"
       />

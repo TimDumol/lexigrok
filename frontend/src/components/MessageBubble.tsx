@@ -11,23 +11,61 @@ export interface Message { // Exporting Message to be used elsewhere
   // For now, onWordClick will receive the clicked word and the full text of this bubble.
 }
 
+import { useState } from 'react';
+
+interface Word {
+  text: string;
+  index: number;
+  selected: boolean;
+}
+
 interface MessageBubbleProps {
   message: Message;
-  onWordClick: (word: string, index: number) => void;
-  selectedWordIndexes: number[];
+  onTextSelection: (text: string) => void;
   showUserSpokenText?: boolean; // To show user's original spoken text if applicable
   originalUserSpokenText?: string; // The text if user spoke
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
-  onWordClick,
-  selectedWordIndexes,
+  onTextSelection,
   showUserSpokenText,
   originalUserSpokenText,
 }) => {
   const { text, sender } = message;
-  const words = text.split(/(\s+)/); // Split by space, keeping delimiters
+  const [words, setWords] = useState<Word[]>(() =>
+    text.split(/(\s+)/).map((word, index) => ({
+      text: word,
+      index,
+      selected: false,
+    }))
+  );
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+
+  const handleWordClick = (word: Word) => {
+    if (/\s+/.test(word.text)) return; // Ignore whitespace
+
+    let newWords;
+    if (lastClickedIndex === word.index - 2) {
+      newWords = words.map((w) =>
+        w.index === word.index ? { ...w, selected: true } : w
+      );
+    } else {
+      newWords = words.map((w) => ({
+        ...w,
+        selected: w.index === word.index,
+      }));
+    }
+
+    setWords(newWords);
+    setLastClickedIndex(word.index);
+
+    const selectedText = newWords
+      .filter((w) => w.selected)
+      .map((w) => w.text)
+      .join('');
+    onTextSelection(selectedText);
+  };
 
   return (
     <div
@@ -37,16 +75,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
       )}
     >
       <div className="text-sm">
-        {words.map((word, index) => (
+        {words.map((word) => (
           <span
-            key={index}
+            key={word.index}
             className={cn(
               "cursor-pointer",
-              selectedWordIndexes.includes(index) ? "bg-blue-300" : ""
+              word.selected ? "bg-blue-300" : ""
             )}
-            onClick={() => onWordClick(word, index)}
+            onClick={() => handleWordClick(word)}
           >
-            {word}
+            {word.text}
           </span>
         ))}
       </div>
