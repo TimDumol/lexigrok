@@ -10,6 +10,9 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[all]>=0.116.1",
     "minio>=7.2.15",
+    "passlib[bcrypt]>=1.7.4",
+    "python-jose[cryptography]>=3.3.0",
+    "pydantic-settings>=2.0.0",
 ]
 
 [project.scripts]

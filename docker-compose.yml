@@ -17,6 +17,8 @@ services:
     - --host=0.0.0.0
     ports:
       - "127.0.0.1:9933:9933"
+    env_file:
+      - ./backend/.env
     environment:
       - DATABASE_URL=postgresql://lexigrok:NOTPRODcf5962655799c65cf8bf3e811691b@db:5432/lexigrok
       - MINIO_URL=http://minio:9000
