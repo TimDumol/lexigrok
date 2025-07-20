@@ -2,27 +2,49 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import './index.css'; // Assuming global styles are here
-
-// Import the generated route tree
 import { routeTree } from './routeTree.gen';
+import { AuthProvider, useAuth } from './lib/auth';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/api/client';
 
-// Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  context: {
+    auth: {} as AuthContextType,
+  },
+});
 
-// Register the router instance for type safety
+import { AuthContextType } from './lib/auth';
+
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
+  interface RouterContext {
+    auth: AuthContextType;
+  }
 }
 
-// Render the app
+function App() {
+  const auth = useAuth();
+  router.update({
+    context: {
+      auth,
+    },
+  });
+  return <RouterProvider router={router} />;
+}
+
 const rootElement = document.getElementById('root')!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 }
