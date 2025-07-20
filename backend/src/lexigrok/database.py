@@ -1,5 +1,17 @@
 # Global database connection and session management
-# This would typically contain SQLAlchemy setup, but for now we'll keep the mock data structure
+from sqlmodel import Session, create_engine
+
+sqlite_file_name = "test.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
 
 fake_users_db = {}
 

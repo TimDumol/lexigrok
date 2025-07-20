@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from sqlmodel import Session
 
 from lexigrok.conversation import schemas
 from lexigrok.auth.dependencies import get_current_active_user
@@ -7,6 +8,7 @@ from lexigrok.conversation.service import (
     process_user_message_service,
     get_conversation_suggestion_service,
 )
+from lexigrok.database import get_session
 
 router = APIRouter(
     prefix="/conversation",
@@ -18,9 +20,10 @@ router = APIRouter(
 async def post_user_message(
     message: schemas.UserMessage,
     current_user: UserInDB = Depends(get_current_active_user),
+    db: Session = Depends(get_session),
 ):
     """Process a user's message and get a bot response."""
-    return process_user_message_service(message)
+    return process_user_message_service(message, db, current_user.username)
 
 
 @router.post("/suggest", response_model=schemas.ConversationSuggestionResponse)
