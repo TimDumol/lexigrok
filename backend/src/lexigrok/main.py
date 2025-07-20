@@ -1,19 +1,37 @@
-import time
 from datetime import timedelta
+
+
+from lexigrok import crud
+from sqlmodel import Session
+
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
+from sqlmodel import SQLModel
+
 
 from lexigrok import schemas, users
 from lexigrok.security import create_access_token, get_current_active_user
 from lexigrok.storage import MinioStorage, Storage
+from lexigrok.database import engine
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
 
 app = FastAPI(
     title="Language Learning App API",
     description="API for practicing language skills.",
     version="0.1.0",
 )
+
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
 
 app.include_router(users.router)
 
@@ -165,6 +183,11 @@ async def create_custom_topic(
     return custom_topic
 
 
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
 # --- Conversation Endpoints ---
 @app.post(
     "/conversation/message", response_model=schemas.BotResponse, tags=["Conversation"]
@@ -172,11 +195,29 @@ async def create_custom_topic(
 async def post_user_message(
     message: schemas.UserMessage,
     current_user: schemas.User = Depends(get_current_active_user),
+    db: Session = Depends(get_session),
 ):
     """
     Process a user's message (text or transcribed voice) and get a bot response.
     This is where the core language model interaction would happen.
     """
+    if message.session_id:
+        conversation = crud.get_conversation(db, int(message.session_id))
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+    else:
+        conversation = crud.create_conversation(db, user_id=current_user.username)
+
+    # Store user message
+    user_message = schemas.MessageCreate(
+        conversation_id=conversation.id,
+        is_user_message=True,
+        text=message.text,
+        audio_url=None,  # Assuming no audio for now
+        transcription=None,
+    )
+    crud.create_message(db, user_message)
+
     # Updated placeholder logic to check for image
     if message.topic_id == "image-practice" and message.imageUrl:
         # If it's an image practice session, the bot's response should be about the image
@@ -198,10 +239,16 @@ async def post_user_message(
         elif "food" in (message.topic_id or ""):
             suggestion = "¿Qué tipo de comida te gusta?"
 
-    session_id = message.session_id or f"session_{int(time.time())}"
+    # Store bot message
+    bot_message = schemas.MessageCreate(
+        conversation_id=conversation.id,
+        is_user_message=False,
+        text=bot_text,
+    )
+    crud.create_message(db, bot_message)
 
     return schemas.BotResponse(
-        session_id=session_id, response_text=bot_text, suggestion=suggestion
+        session_id=str(conversation.id), response_text=bot_text, suggestion=suggestion
     )
 
 
