@@ -11,6 +11,14 @@ export interface Message { // Exporting Message to be used elsewhere
   // For now, onWordClick will receive the clicked word and the full text of this bubble.
 }
 
+import { useState } from 'react';
+
+interface Word {
+  text: string;
+  index: number;
+  selected: boolean;
+}
+
 interface MessageBubbleProps {
   message: Message;
   onTextSelection: (text: string) => void;
@@ -25,12 +33,38 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   originalUserSpokenText,
 }) => {
   const { text, sender } = message;
+  const [words, setWords] = useState<Word[]>(() =>
+    text.split(/(\s+)/).map((word, index) => ({
+      text: word,
+      index,
+      selected: false,
+    }))
+  );
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
 
-  const handleMouseUp = () => {
-    const selectedText = window.getSelection()?.toString().trim() ?? '';
-    if (selectedText) {
-      onTextSelection(selectedText);
+  const handleWordClick = (word: Word) => {
+    if (/\s+/.test(word.text)) return; // Ignore whitespace
+
+    let newWords;
+    if (lastClickedIndex === word.index - 2) {
+      newWords = words.map((w) =>
+        w.index === word.index ? { ...w, selected: true } : w
+      );
+    } else {
+      newWords = words.map((w) => ({
+        ...w,
+        selected: w.index === word.index,
+      }));
     }
+
+    setWords(newWords);
+    setLastClickedIndex(word.index);
+
+    const selectedText = newWords
+      .filter((w) => w.selected)
+      .map((w) => w.text)
+      .join('');
+    onTextSelection(selectedText);
   };
 
   return (
@@ -39,9 +73,21 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         "max-w-[70%] p-3 rounded-lg shadow-sm mb-3 break-words",
         sender === 'user' ? "bg-blue-500 text-white self-end ml-auto" : "bg-gray-200 text-gray-800 self-start mr-auto"
       )}
-      onMouseUp={handleMouseUp}
     >
-      <div className="text-sm">{text}</div>
+      <div className="text-sm">
+        {words.map((word) => (
+          <span
+            key={word.index}
+            className={cn(
+              "cursor-pointer",
+              word.selected ? "bg-blue-300" : ""
+            )}
+            onClick={() => handleWordClick(word)}
+          >
+            {word.text}
+          </span>
+        ))}
+      </div>
       {sender === 'user' && showUserSpokenText && originalUserSpokenText && (
         <div className="text-xs text-blue-200 mt-1 italic">
           (You said: {originalUserSpokenText})

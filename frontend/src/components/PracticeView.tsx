@@ -114,9 +114,6 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     });
   };
 
-  const handleCloseTranslationSidebar = () => {
-    setTranslationSidebar({ ...translationSidebar, isOpen: false });
-  };
 
   const isImagePractice = currentTopicId === 'image-practice' && imageUrl;
 
@@ -156,9 +153,9 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     </div>
   );
 
-  return (
-    <>
-      {isImagePractice ? (
+  const MainContent = () => {
+    if (isImagePractice) {
+      return (
         <ResizablePanelGroup direction="horizontal" className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
           <ResizablePanel defaultSize={50}>
             <div className="flex h-full items-center justify-center p-4">
@@ -170,15 +167,29 @@ const PracticeView: React.FC<PracticeViewProps> = ({
             <ChatInterface />
           </ResizablePanel>
         </ResizablePanelGroup>
-      ) : (
-        <div className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
-          <ChatInterface />
-        </div>
-      )}
-      <TranslationSidebar
-        {...translationSidebar}
-        onClose={handleCloseTranslationSidebar}
-      />
+      );
+    }
+    return (
+      <div className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
+        <ChatInterface />
+      </div>
+    );
+  };
+
+
+  return (
+    <>
+      <ResizablePanelGroup direction="horizontal" className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
+        <ResizablePanel defaultSize={70}>
+          <MainContent />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={30}>
+          <TranslationSidebar
+            {...translationSidebar}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </>
   );
 };
