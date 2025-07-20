@@ -1,5 +1,5 @@
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/authHooks';
 import { Button } from '@/components/ui/button';
 
 export const Route = createRootRoute({

@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import PracticeView from '@/components/PracticeView';
 import { z } from 'zod';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/authHooks';
 
 // Updated search params schema to include optional imageUrl
 const practiceSearchSchema = z.object({

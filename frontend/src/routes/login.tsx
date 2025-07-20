@@ -1,4 +1,4 @@
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/authHooks';
 import { apiClient } from '@/lib/api/client';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -27,7 +27,7 @@ export default function LoginComponent() {
         },
       });
     },
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
       if (response.data) {
         auth.login(response.data.access_token);
         navigate({ to: '/' });

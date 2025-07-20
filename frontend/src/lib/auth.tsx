@@ -1,11 +1,10 @@
 import {
   type PropsWithChildren,
-  createContext,
-  useContext,
   useEffect,
   useState,
 } from 'react';
 import { apiClient } from './api/client';
+import { AuthContext } from './authContext';
 
 export interface AuthContextType {
   token: string | null;
@@ -13,8 +12,6 @@ export interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
 }
-
-export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [token, setToken] = useState<string | null>(() =>
@@ -24,12 +21,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
-      (apiClient as any).options.headers = {
-        Authorization: `Bearer ${token}`,
-      };
+      apiClient.defaults.headers.Authorization = `Bearer ${token}`;
     } else {
       localStorage.removeItem('token');
-      delete (apiClient as any).options.headers?.['Authorization'];
+      delete apiClient.defaults.headers.Authorization;
     }
   }, [token]);
 
@@ -48,12 +43,4 @@ export function AuthProvider({ children }: PropsWithChildren) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }
