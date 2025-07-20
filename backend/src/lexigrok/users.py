@@ -9,7 +9,7 @@ router = APIRouter(
 )
 
 
-def authenticate_user(username, password):
+def authenticate_user(username: str, password: str):
     user = crud.get_user(username)
     if not user:
         return False
@@ -19,7 +19,7 @@ def authenticate_user(username, password):
 
 
 @router.post("/", response_model=schemas.User)
-async def create_user(user: schemas.UserCreate):
+async def create_user(user: schemas.UserCreate) -> schemas.UserInDB:
     db_user = crud.get_user(user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")

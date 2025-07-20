@@ -11,7 +11,7 @@ def get_user(username: str):
         return schemas.UserInDB(**user_dict)
 
 
-def create_user(user: schemas.UserCreate, hashed_password):
+def create_user(user: schemas.UserCreate, hashed_password: str):
     user_in_db = schemas.UserInDB(
         username=user.username,
         email=user.email,
@@ -31,7 +31,7 @@ def create_conversation(db: Session, user_id: str) -> models.Conversation:
     return conversation
 
 
-def get_conversation(db: Session, conversation_id: int) -> models.Conversation:
+def get_conversation(db: Session, conversation_id: int) -> models.Conversation | None:
     return db.get(models.Conversation, conversation_id)
 
 
