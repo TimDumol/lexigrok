@@ -1,6 +1,9 @@
+import os
 from fastapi.testclient import TestClient
 
 from lexigrok.main import app
+
+os.environ["SECRET_KEY"] = "test"
 
 client = TestClient(app)
 

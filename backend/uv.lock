@@ -431,6 +431,7 @@ dependencies = [
     { name = "fastapi", extra = ["all"] },
     { name = "minio" },
     { name = "passlib", extra = ["bcrypt"] },
+    { name = "pydantic-settings" },
     { name = "python-jose", extra = ["cryptography"] },
 ]
 
@@ -447,6 +448,7 @@ requires-dist = [
     { name = "fastapi", extras = ["all"], specifier = ">=0.116.1" },
     { name = "minio", specifier = ">=7.2.15" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
+    { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.3.0" },
 ]
 

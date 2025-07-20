@@ -1,8 +1,11 @@
+import os
 import pytest
 from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 from lexigrok.main import app, get_storage
 from lexigrok.storage import Storage
+
+os.environ["SECRET_KEY"] = "test"
 
 
 @pytest.fixture
