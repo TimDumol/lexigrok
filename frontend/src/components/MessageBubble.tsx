@@ -13,25 +13,21 @@ export interface Message { // Exporting Message to be used elsewhere
 
 interface MessageBubbleProps {
   message: Message;
-  onTextSelection: (text: string) => void;
+  onWordClick: (word: string, index: number) => void;
+  selectedWordIndexes: number[];
   showUserSpokenText?: boolean; // To show user's original spoken text if applicable
   originalUserSpokenText?: string; // The text if user spoke
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
   message,
-  onTextSelection,
+  onWordClick,
+  selectedWordIndexes,
   showUserSpokenText,
   originalUserSpokenText,
 }) => {
   const { text, sender } = message;
-
-  const handleMouseUp = () => {
-    const selectedText = window.getSelection()?.toString().trim() ?? '';
-    if (selectedText) {
-      onTextSelection(selectedText);
-    }
-  };
+  const words = text.split(/(\s+)/); // Split by space, keeping delimiters
 
   return (
     <div
@@ -39,9 +35,21 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         "max-w-[70%] p-3 rounded-lg shadow-sm mb-3 break-words",
         sender === 'user' ? "bg-blue-500 text-white self-end ml-auto" : "bg-gray-200 text-gray-800 self-start mr-auto"
       )}
-      onMouseUp={handleMouseUp}
     >
-      <div className="text-sm">{text}</div>
+      <div className="text-sm">
+        {words.map((word, index) => (
+          <span
+            key={index}
+            className={cn(
+              "cursor-pointer",
+              selectedWordIndexes.includes(index) ? "bg-blue-300" : ""
+            )}
+            onClick={() => onWordClick(word, index)}
+          >
+            {word}
+          </span>
+        ))}
+      </div>
       {sender === 'user' && showUserSpokenText && originalUserSpokenText && (
         <div className="text-xs text-blue-200 mt-1 italic">
           (You said: {originalUserSpokenText})

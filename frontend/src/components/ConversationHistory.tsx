@@ -6,14 +6,16 @@ import { cn } from '@/lib/utils';
 
 interface ConversationHistoryProps {
   messages: Message[];
-  onTextSelection: (text: string) => void;
+  onWordClick: (word: string, index: number) => void;
+  selectedWordIndexes: number[];
   showUserSpokenTextSetting?: boolean; // Global setting from PracticeView
   className?: string;
 }
 
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   messages,
-  onTextSelection,
+  onWordClick,
+  selectedWordIndexes,
   // showUserSpokenTextSetting,
   className,
 }) => {
@@ -42,7 +44,8 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
               <MessageBubble
                 key={msg.id}
                 message={msg}
-                onTextSelection={onTextSelection}
+                onWordClick={(word, index) => onWordClick(word, index)}
+                selectedWordIndexes={selectedWordIndexes}
               // Assuming originalUserSpokenText is part of the Message object if applicable
               // showUserSpokenText={msg.sender === 'user' ? showUserSpokenTextSetting : undefined}
               // originalUserSpokenText={msg.sender === 'user' ? msg.originalSpokenText : undefined}

@@ -100,23 +100,32 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     handleSendMessage(suggestion);
   };
 
-  const handleTextSelection = (text: string) => {
-    if (text.trim() === '') {
-      return;
-    }
+  const [selectedWordIndexes, setSelectedWordIndexes] = useState<number[]>([]);
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+
+  const handleWordClick = (word: string, index: number) => {
+    if (/\s+/.test(word)) return; // Ignore whitespace
+
+    const newSelectedWordIndexes =
+      lastClickedIndex === index - 2
+        ? [...selectedWordIndexes, index]
+        : [index];
+
+    setSelectedWordIndexes(newSelectedWordIndexes);
+    setLastClickedIndex(index);
+
+    const words = newSelectedWordIndexes.map(i => messages.find(m => m.text.split(/(\s+)/)[i] === word)?.text.split(/(\s+)/)[i]).join('');
+
     setTranslationSidebar({
       isOpen: true,
-      selectedText: text,
-      translation: `Translation of "${text}"`, // Placeholder
+      selectedText: words,
+      translation: `Translation of "${words}"`, // Placeholder
       explanation: "This is a placeholder explanation for the selected text.",
       exampleSentence: "This is a placeholder example sentence.",
       exampleTranslation: "This is a placeholder example sentence translation.",
     });
   };
 
-  const handleCloseTranslationSidebar = () => {
-    setTranslationSidebar({ ...translationSidebar, isOpen: false });
-  };
 
   const isImagePractice = currentTopicId === 'image-practice' && imageUrl;
 
@@ -142,7 +151,8 @@ const PracticeView: React.FC<PracticeViewProps> = ({
       />
       <ConversationHistory
         messages={messages}
-        onTextSelection={handleTextSelection}
+        onWordClick={handleWordClick}
+        selectedWordIndexes={selectedWordIndexes}
         showUserSpokenTextSetting={showSpokenText}
         className="flex-grow"
       />
@@ -156,9 +166,9 @@ const PracticeView: React.FC<PracticeViewProps> = ({
     </div>
   );
 
-  return (
-    <>
-      {isImagePractice ? (
+  const MainContent = () => {
+    if (isImagePractice) {
+      return (
         <ResizablePanelGroup direction="horizontal" className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
           <ResizablePanel defaultSize={50}>
             <div className="flex h-full items-center justify-center p-4">
@@ -170,15 +180,29 @@ const PracticeView: React.FC<PracticeViewProps> = ({
             <ChatInterface />
           </ResizablePanel>
         </ResizablePanelGroup>
-      ) : (
-        <div className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
-          <ChatInterface />
-        </div>
-      )}
-      <TranslationSidebar
-        {...translationSidebar}
-        onClose={handleCloseTranslationSidebar}
-      />
+      );
+    }
+    return (
+      <div className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
+        <ChatInterface />
+      </div>
+    );
+  };
+
+
+  return (
+    <>
+      <ResizablePanelGroup direction="horizontal" className="h-full max-h-[calc(100vh-var(--header-height,60px))]">
+        <ResizablePanel defaultSize={70}>
+          <MainContent />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={30}>
+          <TranslationSidebar
+            {...translationSidebar}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </>
   );
 };
