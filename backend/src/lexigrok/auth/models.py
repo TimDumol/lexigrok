@@ -1,15 +1,15 @@
-from lexigrok import schemas
+from lexigrok.auth import schemas
+from lexigrok.database import fake_users_db
 
-fake_users_db = {}
 
-
-def get_user(username: str):
+def get_user(username: str) -> schemas.UserInDB | None:
     if username in fake_users_db:
         user_dict = fake_users_db[username]
         return schemas.UserInDB(**user_dict)
+    return None
 
 
-def create_user(user: schemas.UserCreate, hashed_password):
+def create_user(user: schemas.UserCreate, hashed_password: str) -> schemas.UserInDB:
     user_in_db = schemas.UserInDB(
         username=user.username,
         email=user.email,

@@ -12,13 +12,13 @@ class Storage(ABC):
 
 class MinioStorage(Storage):
     def __init__(self):
-        self.client = Minio(
+        self.client: Minio = Minio(
             endpoint=os.environ["MINIO_ENDPOINT"],
             access_key=os.environ["MINIO_ACCESS_KEY"],
             secret_key=os.environ["MINIO_SECRET_KEY"],
             secure=os.environ["MINIO_SECURE"].lower() == "true",
         )
-        self.bucket_name = os.environ["MINIO_BUCKET"]
+        self.bucket_name: str = os.environ["MINIO_BUCKET"]
 
     def get_presigned_url(self, file_name: str) -> str:
         # Make sure the bucket exists.
