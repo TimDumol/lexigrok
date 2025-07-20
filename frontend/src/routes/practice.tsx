@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import PracticeView from '@/components/PracticeView';
-;
 import { z } from 'zod';
+import { useAuth } from '@/lib/authHooks';
 
 // Updated search params schema to include optional imageUrl
 const practiceSearchSchema = z.object({
@@ -12,6 +12,14 @@ const practiceSearchSchema = z.object({
 
 export const Route = createFileRoute('/practice')({
   validateSearch: practiceSearchSchema,
+  beforeLoad: () => {
+    const { isAuthenticated } = useAuth();
+    if (!isAuthenticated) {
+      throw redirect({
+        to: '/login',
+      });
+    }
+  },
   component: PracticeComponent,
 });
 
