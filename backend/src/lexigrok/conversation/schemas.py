@@ -24,11 +24,16 @@ class ConversationSuggestionResponse(BaseModel):
     suggestion: str
 
 
+from typing import Any, Dict
+from pydantic import BaseModel
+
+
 class MessageBase(BaseModel):
     is_user_message: bool
     text: str | None = None
     audio_url: str | None = None
     transcription: str | None = None
+    generation_details: Dict[str, Any] | None = None
 
 
 class MessageCreate(MessageBase):

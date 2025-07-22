@@ -55,8 +55,15 @@ def authenticated_client(client: TestClient):
 
 
 def test_create_and_get_conversation(
-    authenticated_client: TestClient, session: Session
+    authenticated_client: TestClient, session: Session, mocker
 ):
+    mocker.patch(
+        "lexigrok.generation.openai_strategy.OpenAIStrategy.get_response",
+        return_value={
+            "text": "mocked response",
+            "generation_details": {"strategy": "mock"},
+        },
+    )
     response = authenticated_client.post(
         "/conversation/message",
         json={"text": "Hello", "topic_id": "test"},

@@ -6,6 +6,9 @@ from lexigrok.conversation import schemas
 from lexigrok.conversation.models import Conversation, Message
 
 
+from lexigrok.generation.openai_strategy import OpenAIStrategy
+
+
 def process_user_message_service(
     message: schemas.UserMessage,
     db: Session,
@@ -32,34 +35,28 @@ def process_user_message_service(
     )
     create_message(db, user_message)
 
-    # Updated placeholder logic to check for image
-    if message.topic_id == "image-practice" and message.imageUrl:
-        # If it's an image practice session, the bot's response should be about the image
-        # A real implementation would use a multimodal model (like GPT-4 Vision)
-        # to analyze the image and the user's text.
-        bot_text = f"Analizando la imagen y tu descripción: '{message.text}'. ¡Buen trabajo! ¿Qué más ves?"
-        suggestion = "Describe el fondo de la imagen."
-    else:
-        # Standard topic-based response
-        bot_text = f"Bot processed: '{message.text}'"
-        if message.topic_id:
-            bot_text += f" (on topic: {message.topic_id})"
-
-        suggestion = (
-            "Puedes preguntarme sobre el tiempo."  # "You can ask me about the weather."
-        )
-        if "pharmacy" in (message.topic_id or ""):
-            suggestion = "¿Necesitas algo más de la farmacia?"
-        elif "food" in (message.topic_id or ""):
-            suggestion = "¿Qué tipo de comida te gusta?"
+    # Generate response
+    strategy = OpenAIStrategy()
+    generation_output = strategy.get_response(conversation.messages, temperature=0.7)
+    bot_text = generation_output["text"]
+    generation_details = generation_output["generation_details"]
 
     # Store bot message
     bot_message = schemas.MessageCreate(
         conversation_id=conversation.id,
         is_user_message=False,
         text=bot_text,
+        generation_details=generation_details,
     )
     create_message(db, bot_message)
+
+    suggestion = (
+        "Puedes preguntarme sobre el tiempo."  # "You can ask me about the weather."
+    )
+    if "pharmacy" in (message.topic_id or ""):
+        suggestion = "¿Necesitas algo más de la farmacia?"
+    elif "food" in (message.topic_id or ""):
+        suggestion = "¿Qué tipo de comida te gusta?"
 
     return schemas.BotResponse(
         session_id=str(conversation.id), response_text=bot_text, suggestion=suggestion
